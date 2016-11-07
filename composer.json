@@ -1,0 +1,13 @@
+{
+    "name": "crewsense/sdk",
+    "description": "CallBack Staffing Systems, LLC API PHP-SDK",
+    "authors": [
+        {
+            "name": "gabor",
+            "email": "gabor87@outlook.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^6.2"
+    }
+}
