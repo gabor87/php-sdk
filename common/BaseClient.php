@@ -1,27 +1,35 @@
 <?php
 
-namespace Crewsense;
+namespace Crewsense\apisdk\common;
+
+use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 
 /**
  * Description of Client
  *
  * @author gabor
+ * 
+ * @method type methodName(type $paramName) Description
  */
-class Client extends \GuzzleHttp\Client {
+abstract class BaseClient extends Client {
     
-    const API_BASE_URI = 'http://crewsense.local';
+    public static $API_BASE_URI = 'http://crewsense.local';
+    public static $AUTH_TOKEN_FILE_PATH = 'crewsense_api.token';
 
     public $guestMode = true;
     public $credentials;
     public $access_token;
+    
+    protected $version = null;
 
-    public function __construct($configuration, $autoConnect = true) 
+    public function __construct($configuration) 
     {
         $this->credentials = $configuration['credentials'];
         unset($configuration['credentials']);
         
         if (!isset($configuration['base_uri'])) {
-            $configuration['base_uri'] = self::API_BASE_URI;
+            $configuration['base_uri'] = self::$API_BASE_URI;
         }
         
         parent::__construct($configuration);
@@ -31,7 +39,7 @@ class Client extends \GuzzleHttp\Client {
     
     public function tryObtainTheToken()
     {
-        if (!file_exists('crewsense_api.token')) {
+        if (!file_exists(static::$AUTH_TOKEN_FILE_PATH)) {
             $response = parent::request('POST', '/oauth/access_token', [
                 'form_params' => [
                     'client_id' => $this->credentials['client_id'], // '8fkmab4vzx',
@@ -43,23 +51,39 @@ class Client extends \GuzzleHttp\Client {
             $jsonResponse = (string) $response->getBody();
             $json = json_decode($jsonResponse);
             
-            @file_put_contents('crewsense_api.token', $json->access_token);
+            @file_put_contents(static::$AUTH_TOKEN_FILE_PATH, $json->access_token);
             
             $this->access_token = $json->access_token;
         } else {
-            $this->access_token = @file_get_contents('crewsense_api.token');
+            $this->access_token = @file_get_contents(static::$AUTH_TOKEN_FILE_PATH);
         }
     }
     
     public function tokenIsValid() 
     {
-        var_dump(parent::request('GET', '/v1/me', [
+        $response = $this->get('/me', [
             'headers' => [
                 'Authorization' => "Bearer {$this->access_token}",
             ],
-        ]));
-
-        die;
+        ]);
+        
+        
+    }
+    
+    private function getVersionUri($path)
+    {
+        return $this->version . $path;
+    }
+    
+    public function __call($method, $args)
+    {
+        if (count($args) < 1) {
+            throw new \InvalidArgumentException('Magic request methods require a URI and optional options array');
+        }
+        
+        $args[0] = $this->getVersionUri($args[0]);
+        
+        return parent::__call($method, $args);
     }
     
 }
