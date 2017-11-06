@@ -3,23 +3,23 @@
 namespace Crewsense\apisdk\v1\resources;
 
 use Crewsense\apisdk\common\BaseChildFullResource;
-use Crewsense\apisdk\v1\entities\AssignmentGroup;
+use Crewsense\apisdk\v1\entities\CallbackUser;
 
 /**
- * Description of AssignmentsGroups
+ * Description of CallbacksUsers
  *
  * @author Varga Gábor <gabor87@outlook.com>
  */
-class AssignmentsGroups extends BaseChildFullResource
-{
+class CallbacksUsers extends BaseChildFullResource {
+    
     public static function getParentClass()
     {
-        return Assignments::className();
+        return Callbacks::className();
     }
 
     public static function getEntityClass()
     {
-        return AssignmentGroup::className();
+        return CallbackUser::classShortName();
     }
-
+    
 }

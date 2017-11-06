@@ -29,6 +29,20 @@ abstract class BaseChildResource extends BaseResource
     
     /**
      * 
+     * @param \Crewsense\apisdk\common\BaseClient $client
+     * @return BaseResource
+     */
+    public static function getInstance(BaseClient $client, $parentId)
+    {
+        if (!static::$instance) {
+            static::$instance = new static($client ? $client : static::$client, $parentId);
+        }
+        
+        return static::$instance;
+    }
+    
+    /**
+     * 
      * @return string
      */
     public function getResourcePath()

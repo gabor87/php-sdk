@@ -2,15 +2,29 @@
 
 namespace Crewsense\apisdk\common;
 
+use Crewsense\apisdk\v1\Client;
+
 /**
  * Description of BaseResource
  *
  * @author Varga Gábor <gabor87@outlook.com>
  */
-class BaseResource
+abstract class BaseResource
 {
     use ClassNameTrait;
     
+    /**
+     *
+     * @var \Crewsense\apisdk\v1\Client
+     */
+    protected static $client;
+    
+    /**
+     *
+     * @var BaseResource
+     */
+    protected static $instance;
+
     /**
      *
      * @var BaseClient
@@ -22,11 +36,33 @@ class BaseResource
      * @param \Crewsense\apisdk\common\BaseClient $client
      * @param type $parent
      */
-    public function __construct(BaseClient $client, $parent = null)
+    public function __construct(BaseClient $client)
     {
         $this->client = $client;
     }
     
+    /**
+     * 
+     * @param \Crewsense\apisdk\common\BaseClient $client
+     * @return BaseResource
+     */
+    public static function getInstance(BaseClient $client = null)
+    {
+        if (!static::$instance) {
+            static::$instance = new static($client ? $client : static::$client);
+        }
+        
+        return static::$instance;
+    }
+    
+    public static function getClient() {
+        return self::$client;
+    }
+
+    public static function setClient(Client $client) {
+        self::$client = $client;
+    }
+
     /**
      * 
      * @return string
@@ -51,29 +87,10 @@ class BaseResource
     {
         return '/' . static::getResourceName();
     }
-
-    public function get($id = null)
-    {
-        return $this->client->get($this->getResourcePath() . '/' . $id);
-    }
     
-    public function post($data)
-    {
-        return $this->client->post($this->getResourcePath(), [
-            'body' => $data,
-        ]);
-    }
-    
-    public function patch($id, $data)
-    {
-        return $this->client->patch($this->getResourcePath() . '/' . $id, [
-            'body' => $data,
-        ]);
-    }
-    
-    public function delete($id)
-    {
-        return $this->client->delete($this->getResourcePath() . '/' . $id);
-    }
+    /**
+     * 
+     */
+    public static abstract function getEntityClass();
 
 }

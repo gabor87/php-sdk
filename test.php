@@ -16,9 +16,15 @@ $client = new Crewsense\apisdk\v1\Client([
     ],
 ]);
 
-$assignmentsGroups = new \Crewsense\apisdk\v1\resources\AssignmentsGroups($client, 1);
-echo $assignmentsGroups->getResourcePath();
-echo PHP_EOL;
+$assignmentsResource = new \Crewsense\apisdk\v1\resources\Assignments($client);
+$formsResource = new \Crewsense\apisdk\v1\resources\Forms($client);
 
-//$client->
+$assignments = $assignmentsResource->get();
+$forms = $formsResource->get();
 
+foreach ($assignments as $assignment) {
+//    $assignment->
+    var_dump($assignment); die;
+}
+
+die;

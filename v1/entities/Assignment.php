@@ -36,6 +36,5 @@ class Assignment extends BaseEntity
     public $color;
     
     public $self_scheduling_requires_approval;
-    
-    
+        
 }
